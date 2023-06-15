@@ -375,6 +375,11 @@ function_declarator
 --
 -- * GNU extension: ' __asm__ (...); ' statements
 --
+
+statement_maybe_with_attr :: { CStat }
+statement_maybe_with_attr
+  : statement			{ $1 }
+
 statement :: { CStat }
 statement
   : labeled_statement			{ $1 }
@@ -392,7 +397,8 @@ statement
 --
 labeled_statement :: { CStat }
 labeled_statement
-  : identifier ':' attrs_opt statement		{% withNodeInfo $1 $ CLabel $1 $4 $3 }
+--  : identifier ':' attrs_opt statement		{% withNodeInfo $1 $ CLabel $1 $4 $3 }
+  : identifier ':' statement		{% withNodeInfo $1 $ CLabel $1 $3 [] }
   | case constant_expression ':' statement	{% withNodeInfo $1 $ CCase $2 $4 }
   | default ':' statement			{% withNodeInfo $1 $ CDefault $3 }
   | case constant_expression "..." constant_expression ':' statement
@@ -427,7 +433,7 @@ block_item_list
 
 block_item :: { CBlockItem }
 block_item
-  : statement			{ CBlockStmt $1 }
+  : statement_maybe_with_attr			{ CBlockStmt $1 }
   | nested_declaration		{ $1 }
 
 nested_declaration :: { CBlockItem }
@@ -464,7 +470,7 @@ label_declarations
 --
 expression_statement :: { CStat }
 expression_statement
-  : ';'				{% withNodeInfo $1 $ CExpr Nothing }
+  : attrs_opt ';'				{% withNodeInfo $1 $ CExpr Nothing }
   | expression ';'		{% withNodeInfo $1 $ CExpr (Just $1) }
 
 
