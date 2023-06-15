@@ -221,7 +221,7 @@ exportEnumTypeRef (EnumType sue_ref _ _ node_info) = exportEnumTypeDecl (EnumTyp
 
 -- XXX: relies on a the source program not having any $'s in it
 exportSUERef :: SUERef -> Maybe Ident
-exportSUERef (AnonymousRef name) = Just (internalIdent $ "$" ++ show (nameId name))
+exportSUERef (AnonymousRef name) = Just (internalIdent $ "<anonymous>" {- "$" ++ show (nameId name)-})
 exportSUERef (NamedRef ident) = Just ident
 
 exportMemberDecl :: MemberDecl -> CDecl
